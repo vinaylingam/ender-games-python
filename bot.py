@@ -4,16 +4,12 @@ import random
 import KEYS
 import logging
 import pyrebase
+import json
 
-#logging.basicConfig(level=logging.INFO)
-#logger = logging.getLogger('discord')
-#logger.setLevel(logging.DEBUG)
-#handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
-#handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-#logger.addHandler(handler)
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
 
 config = {
-  "apiKey": KEYS.apiKey,
+  "apiKey": KEYS.apiKeyFirebase,
   "authDomain": KEYS.authDomain,
   "databaseURL": KEYS.databaseURL,
   "storageBucket": KEYS.storageBucket,
@@ -23,10 +19,7 @@ config = {
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 
-data = {"serverid" :2, "channelid" : 4}
-db.child('servers').child(1).set(data)
-
-client = commands.Bot(command_prefix = 'h.')
+client = commands.Bot(command_prefix = 'h.', case_insensitive=True)
 
 
 #---------Commands----------#
@@ -39,7 +32,7 @@ async def ping(ctx):
     await ctx.send(f'pong! {round(client.latency * 1000)}ms')
 
 @client.command()
-async def rng(ctx,*, args):
+async def rng(ctx,*, args=''):
     """
     h.rng [a] [b] [c=1(max:10)] 
     picks a random number c number of times between a and b.
@@ -62,7 +55,6 @@ async def rng(ctx,*, args):
                 c = 10
             if c>(b-a+1):
                 c = b-a+1
-        
 
         if a<0 or b<0 or c<0:
             warn += 'Bruhh!! numbers should be >0'
@@ -83,12 +75,49 @@ async def rng(ctx,*, args):
     except:
         await ctx.send('hmm check `h.help rng`')
 
-@client.command()
-async def arena(ctx, *, args):
-    """
-    let's you join a group arena
-    """
+#@client.command()
+#async def whois(ctx, *, args=''):
+#    """
+#    Gives the info about User.
+#    """
+#    #try:
+#    id = args.strip()
+#    fuser = await client.fetch_user(id)
+#    logging.info(fuser)
+#    await ctx.send('got it.')
+#    #except:
+#    #    warn = 'hmm..! i need a id to help you.'
+#    #    await ctx.send(warn)
 
+#@client.command()
+#async def clan(ctx, *, args = ''):
+#    if args == '':
+#        await ctx.send('hmm..')
+#        return
+#    inputs = list(args.split())
+    
+#    authorID = int(f'{ctx.author.id}')
+#    serverID = int(f'{ctx.author.guild.id}')
+#    adminn = db.child("Admins").child(serverID).get()
+#    print(adminn.val())
+#    admins = []
+#    for i in adminn.each():
+#        admins.append(int(i.val()))
+#    if inputs[0] == "add":
+#        if len(inputs) == 1:
+#            await ctx.send("smh... give me a id...")
+#            return
+#        if authorID in admins:
+#            try:
+#                userToAdd = int(inputs[1])
+#            except:
+#                await ctx.send("smh... give me a id...")
+#            #  VERIFY THE USER
+#            #db.child("clanMembers").child(serverID).push(userToAdd)
+#            await ctx.send('admin checked')
+#        else:
+#            await ctx.send("You are not authorised to use this command...!")
+#    return
 
 #--------events-----------#
 @client.event
@@ -97,18 +126,16 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+
+    # guild raid/upgrade reminders
+
+
     print(message.id, message.author.name, message.content)
     print(message)
     embeds = message.embeds
     for embed in embeds:
         print(embed.to_dict())
     print()
-    #s = list(message.content.split())
-    #ss = []
-    #for i in s:
-    #    ss.append(i.lower())
-    #if 'need' in ss:
-    #    await message.channel.send('don\'t we all?')
     await client.process_commands(message)
 
-client.run(KEYS.token)
+client.run(KEYS.discordToken)

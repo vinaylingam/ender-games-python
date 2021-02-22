@@ -3,21 +3,22 @@ from discord.ext import commands
 import random
 import KEYS
 import logging
-import pyrebase
+#import pyrebase
 import json
+import asyncio
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
 
-config = {
-  "apiKey": KEYS.apiKeyFirebase,
-  "authDomain": KEYS.authDomain,
-  "databaseURL": KEYS.databaseURL,
-  "storageBucket": KEYS.storageBucket,
-  "serviceAccount": KEYS.pathToServiceJson
-}
+#config = {
+#  "apiKey": KEYS.apiKeyFirebase,
+#  "authDomain": KEYS.authDomain,
+#  "databaseURL": KEYS.databaseURL,
+#  "storageBucket": KEYS.storageBucket,
+#  "serviceAccount": KEYS.pathToServiceJson
+#}
 
-firebase = pyrebase.initialize_app(config)
-db = firebase.database()
+#firebase = pyrebase.initialize_app(config)
+#db = firebase.database()
 
 client = commands.Bot(command_prefix = 'h.', case_insensitive=True)
 
@@ -34,7 +35,7 @@ async def ping(ctx):
 @client.command()
 async def rng(ctx,*, args=''):
     """
-    h.rng [a] [b] [c=1(max:10)] 
+    h.rng [a] [b] [c=1(max:10)]
     picks a random number c number of times between a and b.
     a,b,c should be non negative and a <= b
     """
@@ -95,7 +96,7 @@ async def rng(ctx,*, args=''):
 #        await ctx.send('hmm..')
 #        return
 #    inputs = list(args.split())
-    
+
 #    authorID = int(f'{ctx.author.id}')
 #    serverID = int(f'{ctx.author.guild.id}')
 #    adminn = db.child("Admins").child(serverID).get()
@@ -127,12 +128,30 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    # guild raid/upgrade reminders
+    await message.channel.send("hi")
+    if client.user.id == message.author.id:
+        return
 
+    # guild raid/upgrade reminders
+    channel = message.channel
+    channelId = channel.id
+    if channelId in [770453997433126933,7409183966859100960]:
+        contents = message.content.lower()
+        if contents.find("rpg guild upgrade") == 0 or contents.find("rpg guild raid") == 0:
+            await channel.send("remainder is set for 10 seconds....! <a:squirtleHype:739616791084400701>")
+            try:
+                await channel.send("waiting...")
+                await client.wait_for("message",timeout=10)
+            except asyncio.TimeoutError:
+                if channelId == 770453997433126933:
+                    await channel.send('<@&797418904162926642>, rpg guild raid/upgrade is ready....!')
+                else:
+                    await channel.send('<@506018589904470047>, rpg guild raid/upgrade is ready....!')
 
     print(message.id, message.author.name, message.content)
     print(message)
     embeds = message.embeds
+    print(len(embeds))
     for embed in embeds:
         print(embed.to_dict())
     print()

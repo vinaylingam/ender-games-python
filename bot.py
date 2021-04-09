@@ -6,6 +6,7 @@ import logging
 #import pyrebase
 import json
 import asyncio
+from collections import defaultdict
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
 
@@ -22,6 +23,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 client = commands.Bot(command_prefix = 'h.', case_insensitive=True)
 
+reminders = defaultdict()
 
 #---------Commands----------#
 @client.command()
@@ -76,6 +78,26 @@ async def rng(ctx,*, args=''):
     except:
         await ctx.send('hmm check `h.help rng`')
 
+@client.command(aliases=['c','calc'], case_insensitive=True)
+async def calculate(ctx,*,args=''):
+    if args == '':
+        await ctx.send("please, enter proper expresision....!")
+        return
+
+    expr = list(args.split())
+    expr = ''.join(expr)
+    expp = expr.replace('x','*')
+
+    ans = ''
+    try:
+        print(expr)
+        ans = eval(expp)
+        await ctx.send(ans)
+    except:
+        await ctx.send("that's not a valid expression!")  
+        return
+    
+
 #@client.command()
 #async def whois(ctx, *, args=''):
 #    """
@@ -128,25 +150,42 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
-    await message.channel.send("hi")
     if client.user.id == message.author.id:
         return
 
+    #def check(message):
+    #    if message.author.id == 555955826880413696:
+    #        embed = message.embeds[0]
+    #        if embed.description == "Guild succesfully upgraded!" or embed.description.find("RAIDED") != 0:
+    #            reminders['h']=2
+    #        else:
+    #            title = embed.title
+    #            if title.find("wait at least **") != -1:
+    #                text, h = title.split("wait at least **")
+    #                h, m = h.split("h ")
+    #                reminders["h"]=int(h)
+    #                m, s = m.split("m ")
+    #                reminders["m"]=int(m)
+    #                s, temp = m.split("s")
+    #                reminders["s"]=int(s)
+    #        return True
+
     # guild raid/upgrade reminders
-    channel = message.channel
-    channelId = channel.id
-    if channelId in [770453997433126933,7409183966859100960]:
-        contents = message.content.lower()
-        if contents.find("rpg guild upgrade") == 0 or contents.find("rpg guild raid") == 0:
-            await channel.send("remainder is set for 10 seconds....! <a:squirtleHype:739616791084400701>")
-            try:
-                await channel.send("waiting...")
-                await client.wait_for("message",timeout=10)
-            except asyncio.TimeoutError:
-                if channelId == 770453997433126933:
-                    await channel.send('<@&797418904162926642>, rpg guild raid/upgrade is ready....!')
-                else:
-                    await channel.send('<@506018589904470047>, rpg guild raid/upgrade is ready....!')
+    #channel = message.channel
+    #channelId = channel.id 
+    #if channelId in [770453997433126933,740918396685910096, 780164101376442368]:
+    #    contents = message.content.lower()
+    #    if contents.find("rpg guild upgrade") == 0 or contents.find("rpg guild raid") == 0:
+    #        try:
+    #            await client.wait_for("message", timeout=3, check = check) 
+    #            time = (reminders["h"]*60 + reminders["m"])*60 + reminders["s"]
+    #            await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
+    #            await channel.send(time)
+    #        except asyncio.TimeoutError:
+    #            if channelId == 770453997433126933:
+    #                await channel.send('<@&797418904162926642>, rpg guild raid/upgrade is ready....!')
+    #            else:
+    #                await channel.send('<@506018589904470047>, rpg guild raid/upgrade is ready....!')
 
     print(message.id, message.author.name, message.content)
     print(message)

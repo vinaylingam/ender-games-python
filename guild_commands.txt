@@ -1,0 +1,36 @@
+RPG GUILD
+_____________________-
+
+commands 
+
+- h.guild 
+- - - displays guild details of the summoner
+- - - - - command gives details about 
+- - - - - 1. Guild role set for the summoner
+- - - - - 2. Guild reminder in : xh xm xs or No reminders found
+
+- h.guild set role <@....>
+- - - attaches a guild to monitor
+- - - - - can only done by administrators of server
+
+- h.guild set channel <#....>
+- - - sets the channel to remind
+- - - - - can only done by administrators of server
+
+- h.guild reminders on/off
+- - - don't reminds ppl about guild raid / upgrade
+
+- h.guild add <@..> , <@..>
+- - - add people to manage guild commands
+____________________
+
+
+events
+
+1. rpg guild 
+- if :white_check_mark: => sends message guild is ready to raid/upgrade
+- else if: timer => checks if there a timer already or not. 
+- - - if: current_timer < set_times => resets timer.
+
+2. rpg guild raid/upgrade
+- sets a new reminder for 2hrs if person has a guild role 

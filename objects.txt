@@ -1,0 +1,24 @@
+<Message id=799495009598439435 
+	channel=	<	TextChannel id=778167058537775112
+					name='sus' 
+					position=54 
+					nsfw=False 
+					news=False 
+					category_id=774973642274242560
+				> 
+	type=		<	MessageType.default: 0
+				> 
+	author=		<	Member id=506018589904470047 
+					name='vinaylingam' 
+					discriminator='2283' 
+					bot=False 
+					nick=None 
+					guild=	<	Guild id=714884228021616732 
+								name="let'sPlayAGame" 
+								shard_id=None 
+								chunked=False 
+								member_count=74
+							>
+				>
+	flags=		<	MessageFlags value=0>
+>

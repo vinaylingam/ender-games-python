@@ -6,6 +6,7 @@ import logging
 #import pyrebase
 import json
 import asyncio
+import threading
 from collections import defaultdict
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
@@ -23,7 +24,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 client = commands.Bot(command_prefix = 'h.', case_insensitive=True)
 
-reminders = defaultdict()
+reminders = defaultdict(int)
 
 #---------Commands----------#
 @client.command()
@@ -153,47 +154,47 @@ async def on_message(message):
     if client.user.id == message.author.id:
         return
 
-    #def check(message):
-    #    if message.author.id == 555955826880413696:
-    #        embed = message.embeds[0]
-    #        if embed.description == "Guild succesfully upgraded!" or embed.description.find("RAIDED") != 0:
-    #            reminders['h']=2
-    #        else:
-    #            title = embed.title
-    #            if title.find("wait at least **") != -1:
-    #                text, h = title.split("wait at least **")
-    #                h, m = h.split("h ")
-    #                reminders["h"]=int(h)
-    #                m, s = m.split("m ")
-    #                reminders["m"]=int(m)
-    #                s, temp = m.split("s")
-    #                reminders["s"]=int(s)
-    #        return True
-
     # guild raid/upgrade reminders
-    #channel = message.channel
-    #channelId = channel.id 
-    #if channelId in [770453997433126933,740918396685910096, 780164101376442368]:
-    #    contents = message.content.lower()
-    #    if contents.find("rpg guild upgrade") == 0 or contents.find("rpg guild raid") == 0:
-    #        try:
-    #            await client.wait_for("message", timeout=3, check = check) 
-    #            time = (reminders["h"]*60 + reminders["m"])*60 + reminders["s"]
-    #            await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
-    #            await channel.send(time)
-    #        except asyncio.TimeoutError:
-    #            if channelId == 770453997433126933:
-    #                await channel.send('<@&797418904162926642>, rpg guild raid/upgrade is ready....!')
-    #            else:
-    #                await channel.send('<@506018589904470047>, rpg guild raid/upgrade is ready....!')
+    channel = message.channel
+    channelId = channel.id 
+    if channelId in [770453997433126933,740918396685910096, 780164101376442368, 778167058537775112]:
+        if message.author.id == 555955826880413696:
+            embed = message.embeds[0]
+            title = embed.title
+            if title.find("wait at least **") != -1:
+                text, h = title.split("wait at least **")
+                hour, m = h.split("h ")
+                reminders["h"]=int(hour)
+                min, s = m.split("m ")
+                reminders["m"]=int(min)
+                sec, temp = s.split("s")
+                reminders["s"]=int(sec)
+            else:
+                reminders['h']=2
+                
+            await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
+            time = 2 #(reminders['h']*60 + reminders['m']) + reminders['s']
+            msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
+            timer = threading.Timer(time,guildReminder,[channelId, msg])
+            timer.start()
 
-    print(message.id, message.author.name, message.content)
+    logging.info("---"*50)
+    print(message.channel.id, message.id, message.author.name, message.content)
+    logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
     print(message)
+    # logging.info(str(message))
     embeds = message.embeds
     print(len(embeds))
     for embed in embeds:
         print(embed.to_dict())
+        # logging.info(str(embed.to_dict()))
     print()
+    
     await client.process_commands(message)
+
+# miscelleanous functions
+async def guildReminder(channelId, msg):
+    remind = client.get_channel(channelId)
+    await remind.send(msg)
 
 client.run(KEYS.discordToken)

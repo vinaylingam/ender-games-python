@@ -143,6 +143,17 @@ async def calculate(ctx,*,args=''):
 #            await ctx.send("You are not authorised to use this command...!")
 #    return
 
+
+# miscelleanous functions
+async def reminder(time, id, msg, where = 'Channel'):
+    await asyncio.sleep(time)
+    if where == 'Channel':
+        remind = client.get_channel(id)
+    else: # DM's
+        remind = cilent.get_user(id)
+    await remind.send(msg)
+
+
 #--------events-----------#
 @client.event
 async def on_ready():
@@ -158,43 +169,43 @@ async def on_message(message):
     channel = message.channel
     channelId = channel.id 
     if channelId in [770453997433126933,740918396685910096, 780164101376442368, 778167058537775112]:
-        if message.author.id == 555955826880413696:
-            embed = message.embeds[0]
-            title = embed.title
-            if title.find("wait at least **") != -1:
-                text, h = title.split("wait at least **")
-                hour, m = h.split("h ")
-                reminders["h"]=int(hour)
-                min, s = m.split("m ")
-                reminders["m"]=int(min)
-                sec, temp = s.split("s")
-                reminders["s"]=int(sec)
-            else:
-                reminders['h']=2
+        if message.author.id == 555955826880413696: # Epic RPG Bot ID
+            if len(message.embeds) >0:
+                embed = message.embeds[0]
+                title = embed.title
+                if title and title.find('guild') != -1:
+                    if title.find("Your guild has already raided or been upgraded, wait at least **") != -1:
+                        text, h = title.split("wait at least **")
+                        hour, m = h.split("h ")
+                        reminders["h"]=int(hour)
+                        min, s = m.split("m ")
+                        reminders["m"]=int(min)
+                        sec, temp = s.split("s")
+                        reminders["s"]=int(sec)
+                    else:
+                        reminders['h']=2
                 
-            await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
-            time = 2 #(reminders['h']*60 + reminders['m']) + reminders['s']
-            msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
-            timer = threading.Timer(time,guildReminder,[channelId, msg])
-            timer.start()
+                    await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
+                    time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
+                    msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
+                    await reminder(time, channelId, msg)
 
     logging.info("---"*50)
     print(message.channel.id, message.id, message.author.name, message.content)
     logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
     print(message)
-    # logging.info(str(message))
+    with open('logs.txt','a') as f:
+        f.write(str(message))
+        f.write('\n')
     embeds = message.embeds
     print(len(embeds))
     for embed in embeds:
         print(embed.to_dict())
-        # logging.info(str(embed.to_dict()))
+        with open('logs.txt','a') as f:
+            f.write(str(embed.to_dict()))
+            f.write('\n')
     print()
     
     await client.process_commands(message)
-
-# miscelleanous functions
-async def guildReminder(channelId, msg):
-    remind = client.get_channel(channelId)
-    await remind.send(msg)
 
 client.run(KEYS.discordToken)

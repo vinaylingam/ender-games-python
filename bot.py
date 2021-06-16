@@ -189,7 +189,7 @@ async def on_message(message):
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
                     msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
-                    logging.info(str(message.author.id), 'triggered the guild command')
+                    logging.info(str(message.author.id) + 'triggered the guild command')
                     await reminder(time, channelId, msg)
                     await reminder(time-reminders['s'], '506018589904470047', msg)
 

@@ -188,23 +188,26 @@ async def on_message(message):
                     await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
                     msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
-                    await reminder(time, channelId, msg)
 
-    logging.info("---"*50)
-    print(message.channel.id, message.id, message.author.name, message.content)
-    logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
-    print(message)
-    with open('logs.txt','a') as f:
-        f.write(str(message))
-        f.write('\n')
-    embeds = message.embeds
-    print(len(embeds))
-    for embed in embeds:
-        print(embed.to_dict())
-        with open('logs.txt','a') as f:
-            f.write(str(embed.to_dict()))
-            f.write('\n')
-    print()
+                    logging.info(str(message.author.id), 'triggered the guild command')
+                    await reminder(time, channelId, msg)
+                    await reminder(time-reminders['s'], '506018589904470047', msg)
+
+    # logging.info("---"*50)
+    # print(message.channel.id, message.id, message.author.name, message.content)
+    # logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
+    # print(message)
+    # with open('logs.txt','a') as f:
+    #     f.write(str(message))
+    #     f.write('\n')
+    # embeds = message.embeds
+    # print(len(embeds))
+    # for embed in embeds:
+    #     print(embed.to_dict())
+    #     with open('logs.txt','a') as f:
+    #         f.write(str(embed.to_dict()))
+    #         f.write('\n')
+    # print()
     
     await client.process_commands(message)
 

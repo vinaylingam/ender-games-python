@@ -6,7 +6,7 @@ import logging
 #import pyrebase
 import json
 import asyncio
-import threading
+import threading 
 from collections import defaultdict
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
@@ -98,6 +98,10 @@ async def calculate(ctx,*,args=''):
         await ctx.send("that's not a valid expression!")  
         return
     
+@client.command()
+async def DM(ctx,a):
+    remind = client.get_user(int(a))
+    await remind.send("Are you a star? coz without you my world is dark.... :wink:")
 
 #@client.command()
 #async def whois(ctx, *, args=''):
@@ -150,7 +154,7 @@ async def reminder(time, id, msg, where = 'Channel'):
     if where == 'Channel':
         remind = client.get_channel(id)
     else: # DM's
-        remind = cilent.get_user(id)
+        remind = client.get_user(id)
     await remind.send(msg)
 
 
@@ -158,6 +162,8 @@ async def reminder(time, id, msg, where = 'Channel'):
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
+    owner = client.get_user(506018589904470047)
+    await owner.send("im up..!")
 
 @client.event
 async def on_message(message):
@@ -173,7 +179,8 @@ async def on_message(message):
             if len(message.embeds) >0:
                 embed = message.embeds[0]
                 title = embed.title
-                if title and title.find('guild') != -1:
+                title = title.lower() if len(title) != 0 else False
+                if title and (title.find('guild') != -1 or title.find('raided') != -1 or title.find('upgrade') != -1) :
                     if title.find("Your guild has already raided or been upgraded, wait at least **") != -1:
                         text, h = title.split("wait at least **")
                         hour, m = h.split("h ")
@@ -185,14 +192,30 @@ async def on_message(message):
                     else:
                         reminders['h']=2
                 
-                    await channel.send("remainder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
+                    await channel.send("reminder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
                     msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
                     logging.info(str(message.author.id) + 'triggered the guild command')
                     await reminder(time, channelId, msg)
-                    await reminder(time-reminders['s'], '506018589904470047', msg)
+                    await reminder(time-reminders['s'], 506018589904470047, msg)
 
+    if message.content == 'h.history':
+        await message.channel.send("pulling last epic rpg messages....")
+        c = 0
+        async for m in message.channel.history(limit=5):
+            if m.author.id == 555955826880413696:
+                print(m)
+                with open('guild.txt','a') as f:
+                    f.write(str(m))
+                    f.write('\n')
+                embeds = m.embeds
+                for embed in embeds:
+                    with open('guild.txt','a') as f:
+                        f.write(str(embed.to_dict()))
+                        f.write('\n')
+        await message.channel.send("logging completed..1")
+        
     # logging.info("---"*50)
     # print(message.channel.id, message.id, message.author.name, message.content)
     # logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
@@ -207,7 +230,7 @@ async def on_message(message):
     #     with open('logs.txt','a') as f:
     #         f.write(str(embed.to_dict()))
     #         f.write('\n')
-    # print()
+    #  print()
     
     await client.process_commands(message)
 

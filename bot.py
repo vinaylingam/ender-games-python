@@ -7,6 +7,8 @@ import logging
 import json
 import asyncio
 import threading 
+from datetime import datetime
+from pytz import timezone
 from collections import defaultdict
 
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO, filename = "logs.txt")
@@ -22,7 +24,9 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 #firebase = pyrebase.initialize_app(config)
 #db = firebase.database()
 
-client = commands.Bot(command_prefix = 'h.', case_insensitive=True)
+intents = discord.Intents.default()  # All but the two privileged ones
+intents.members = True  # Subscribe to the Members intent
+client = commands.Bot(command_prefix = 'h.', case_insensitive=True, intents=intents)
 
 reminders = defaultdict(int)
 
@@ -97,11 +101,23 @@ async def calculate(ctx,*,args=''):
     except:
         await ctx.send("that's not a valid expression!")  
         return
-    
+
 @client.command()
-async def DM(ctx,a):
-    remind = client.get_user(int(a))
-    await remind.send("Are you a star? coz without you my world is dark.... :wink:")
+async def history(ctx, limit: int = 100): 
+    if ctx.author.id != 506018589904470047:
+        await ctx.send("You don't have perms to do this command. now scramm.. shuu.. shuu...")
+        return
+    try:
+        messages = await ctx.channel.history(limit=limit).flatten()
+        with open("guild.txt", "a+", encoding="utf-8") as f:
+            for message in messages:
+                print(message, sep='\n\n', file=f)
+                embeds = message.embeds
+                for e in embeds:
+                    print(e, sep="\n\n", file=f)
+        await ctx.send("Succesfully written.")
+    except:
+        await ctx.send("Error occured")
 
 #@client.command()
 #async def whois(ctx, *, args=''):
@@ -157,13 +173,18 @@ async def reminder(time, id, msg, where = 'Channel'):
         remind = client.get_user(id)
     await remind.send(msg)
 
+def printTime():
+    format = "%Y-%m-%d %H:%M:%S %Z%z"
+    utc = datetime.now(timezone('UTC'))
+    ist = utc.astimezone(timezone('Asia/Kolkata'))
+    return ist.strftime(format)
 
 #--------events-----------#
 @client.event
 async def on_ready():
     print('We have logged in as {0.user}'.format(client))
     owner = client.get_user(506018589904470047)
-    await owner.send("im up..!")
+    await owner.send("im up..! - "+ printTime() )
 
 @client.event
 async def on_message(message):
@@ -199,22 +220,6 @@ async def on_message(message):
                     logging.info(str(message.author.id) + 'triggered the guild command')
                     await reminder(time, channelId, msg)
                     await reminder(time-reminders['s'], 506018589904470047, msg)
-
-    if message.content == 'h.history':
-        await message.channel.send("pulling last epic rpg messages....")
-        c = 0
-        async for m in message.channel.history(limit=5):
-            if m.author.id == 555955826880413696:
-                print(m)
-                with open('guild.txt','a') as f:
-                    f.write(str(m))
-                    f.write('\n')
-                embeds = m.embeds
-                for embed in embeds:
-                    with open('guild.txt','a') as f:
-                        f.write(str(embed.to_dict()))
-                        f.write('\n')
-        await message.channel.send("logging completed..1")
         
     # logging.info("---"*50)
     # print(message.channel.id, message.id, message.author.name, message.content)

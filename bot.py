@@ -200,9 +200,10 @@ async def on_message(message):
             if len(message.embeds) >0:
                 embed = message.embeds[0]
                 title = embed.title
+                description = embed.description
                 title = title.lower() if len(title) != 0 else False
-                if title and (title.find('guild') != -1 or title.find('raided') != -1 or title.find('upgrade') != -1) :
-                    if title.find("Your guild has already raided or been upgraded, wait at least **") != -1:
+                if title and (title.find('guild') != -1 or description.find('raided') != -1 or description.find('upgrade') != -1) :
+                    if title.find("your guild has already raided or been upgraded, wait at least **") != -1:
                         text, h = title.split("wait at least **")
                         hour, m = h.split("h ")
                         reminders["h"]=int(hour)
@@ -217,7 +218,7 @@ async def on_message(message):
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
                     msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
-                    logging.info(str(message.author.id) + 'triggered the guild command')
+                    print(str(message.author.id) + ' triggered the guild command')
                     await reminder(time, channelId, msg)
                     await reminder(time-reminders['s'], 506018589904470047, msg)
         
@@ -225,16 +226,14 @@ async def on_message(message):
     # print(message.channel.id, message.id, message.author.name, message.content)
     # logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
     # print(message)
-    # with open('logs.txt','a') as f:
-    #     f.write(str(message))
-    #     f.write('\n')
+    # with open("logs.txt", "a+", encoding="utf-8") as f:
+    #     print(message, sep='\n\n', file=f)
     # embeds = message.embeds
     # print(len(embeds))
     # for embed in embeds:
     #     print(embed.to_dict())
-    #     with open('logs.txt','a') as f:
-    #         f.write(str(embed.to_dict()))
-    #         f.write('\n')
+    #     with open("logs.txt", "a+", encoding="utf-8") as f:
+    #         print(embed.to_dict(), sep='\n\n', file=f)
     #  print()
     
     await client.process_commands(message)

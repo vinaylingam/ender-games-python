@@ -95,7 +95,6 @@ async def calculate(ctx,*,args=''):
 
     ans = ''
     try:
-        print(expr)
         ans = eval(expp)
         await ctx.send(ans)
     except:
@@ -201,8 +200,9 @@ async def on_message(message):
                 embed = message.embeds[0]
                 title = embed.title
                 description = embed.description
-                title = title.lower() if len(title) != 0 else False
-                if title and (title.find('guild') != -1 or description.find('raided') != -1 or description.find('upgrade') != -1) :
+                title = title.lower() if len(embed.title) != 0 else ''
+                description = description.lower() if len(description) != 0 else ''
+                if (title and title.find('guild') != -1) or (description.find('raided') != -1 or description.find('upgrade') != -1) :
                     if title.find("your guild has already raided or been upgraded, wait at least **") != -1:
                         text, h = title.split("wait at least **")
                         hour, m = h.split("h ")
@@ -212,15 +212,13 @@ async def on_message(message):
                         sec, temp = s.split("s")
                         reminders["s"]=int(sec)
                     else:
-                        reminders['h']=2
+                        reminders['h'], reminders['m'], reminders['s']=2,0,0
                 
                     await channel.send("reminder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
                     msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
-                    print(str(message.author.id) + ' triggered the guild command')
                     await reminder(time, channelId, msg)
-                    await reminder(time-reminders['s'], 506018589904470047, msg)
         
     # logging.info("---"*50)
     # print(message.channel.id, message.id, message.author.name, message.content)

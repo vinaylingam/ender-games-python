@@ -49,4 +49,10 @@ async def on_ready():
     await owner.send("im up..! - ")
 
 
+@client.command()
+async def sendDM(ctx):
+    remind = client.get_user(506018589904470047)
+
+    await sendmessage(remind, 1)
+    await sendmessage(remind, 2)
 client.run(KEYS.discordToken)

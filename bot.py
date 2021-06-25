@@ -29,6 +29,7 @@ intents.members = True  # Subscribe to the Members intent
 client = commands.Bot(command_prefix = 'h.', case_insensitive=True, intents=intents)
 
 reminders = defaultdict(int)
+reminderStates = defaultdict(bool)
 
 #---------Commands----------#
 @client.command()
@@ -164,14 +165,24 @@ async def history(ctx, limit: int = 100):
 
 
 # miscelleanous functions
-async def reminder(time, id, msg, where = 'Channel'):
-    await asyncio.sleep(time)
+async def reminder(time, id, msgBeforeReminder, msgAfterReminder, which = '', where = 'Channel'):
     if where == 'Channel':
         remind = client.get_channel(id)
     else: # DM's
         remind = client.get_user(id)
-    await remind.send(msg)
 
+    if which != '' and reminderStates[which] == True:
+        await remind.send('reminder is already Set..!')
+        return
+
+    await remind.send(msgBeforeReminder)
+    if which != '':
+        reminderStates[which] = True
+    await asyncio.sleep(time)
+    await remind.send(msgAfterReminder)
+    if which != '':
+        reminderStates[which] = False
+    
 def printTime():
     format = "%Y-%m-%d %H:%M:%S %Z%z"
     utc = datetime.now(timezone('UTC'))
@@ -191,35 +202,54 @@ async def on_message(message):
     if client.user.id == message.author.id:
         return
 
-    # guild raid/upgrade reminders
     channel = message.channel
     channelId = channel.id 
+
+    # guild raid/upgrade reminder
     if channelId in [770453997433126933,740918396685910096, 780164101376442368, 778167058537775112]:
         if message.author.id == 555955826880413696: # Epic RPG Bot ID
             if len(message.embeds) >0:
                 embed = message.embeds[0]
-                title = embed.title
-                description = embed.description
+                title, description = embed.title, embed.description
                 title = title.lower() if len(embed.title) != 0 else ''
                 description = description.lower() if len(description) != 0 else ''
-                if (title and title.find('guild') != -1) or (description.find('raided') != -1 or description.find('upgrade') != -1) :
+                if title.find('guild') != -1 or description.find('raided') != -1 or description.find('upgrade') != -1 :
                     if title.find("your guild has already raided or been upgraded, wait at least **") != -1:
                         text, h = title.split("wait at least **")
                         hour, m = h.split("h ")
-                        reminders["h"]=int(hour)
                         min, s = m.split("m ")
-                        reminders["m"]=int(min)
                         sec, temp = s.split("s")
-                        reminders["s"]=int(sec)
+                        reminders['h'], reminders['m'], reminders['s'] = int(hour), int(min), int(sec)
                     else:
-                        reminders['h'], reminders['m'], reminders['s']=2,0,0
+                        reminders['h'], reminders['m'], reminders['s'] = 2, 0, 0
                 
-                    await channel.send("reminder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"]))
-                    time = (reminders['h']*60 + reminders['m'])*60 + reminders['s']
-                    msg = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
+                    time = (reminders['h']*60 + reminders['m'])*60 + reminders['s'] # in seconds
+                    msg1 = "reminder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"])
+                    msg2 = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
-                    await reminder(time, channelId, msg)
-        
+                    await reminder(time, channelId, msg1, msg2, 'guildRem') 
+    
+    # disboard reminder
+    if channelId in [857682775578378270, 678167360837779466]:
+        if message.author.id == 302050872383242240: # disboard ID
+            msg1 = ''
+            if len(message.embeds) > 0:
+                embed = message.embeds[0]
+                description = embed.description
+                if description.find('Bump done') != -1:
+                    minutes = 120
+                    personBumped, temps = description.split(', \n')
+                    msg1 = personBumped + ', Ty for bumping. <:okroo:698066343005519872>\n'
+                elif description.find('Please wait another') != -1:
+                    temps0, temps1 = description.split(', Please wait another ')
+                    temps2 = list(temps1.split())
+                    minutes = int(temps2[0])
+
+                    time = minutes*60 # in seconds
+                    msg1 += 'i will remind you to bump in {}mins.'.format(minutes)
+                    msg2 = '<@506018589904470047>, you can bump the server again....!'
+                    await reminder(time, channelId, msg1, msg2, 'bumpRem') 
+
     # logging.info("---"*50)
     # print(message.channel.id, message.id, message.author.name, message.content)
     # logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))

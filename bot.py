@@ -26,7 +26,10 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 intents = discord.Intents.default()  # All but the two privileged ones
 intents.members = True  # Subscribe to the Members intent
-client = commands.Bot(command_prefix = 'h.', case_insensitive=True, intents=intents)
+client = commands.Bot(command_prefix = 'h.',
+                     case_insensitive=True,
+                    intents=intents,
+                    help_command = None)
 
 reminders = defaultdict(int)
 reminderStates = defaultdict(bool)
@@ -43,7 +46,9 @@ async def ping(ctx):
 @client.command()
 async def rng(ctx,*, args=''):
     """
-    h.rng [a] [b] [c=1(max:10)]
+    A random number generator between two numbers.
+    Alias: None
+    eg: h.rng [a] [b] [c=1(max:10)]
     picks a random number c number of times between a and b.
     a,b,c should be non negative and a <= b
     """
@@ -86,6 +91,12 @@ async def rng(ctx,*, args=''):
 
 @client.command(aliases=['c','calc'], case_insensitive=True)
 async def calculate(ctx,*,args=''):
+    """
+    A Basic calculatoar. uwu
+    Aliases: c, calc
+    eg: h.calc (1+2-3/4)
+    returns: a message, if expression is not valid.
+    """
     if args == '':
         await ctx.send("please, enter proper expresision....!")
         return
@@ -96,73 +107,48 @@ async def calculate(ctx,*,args=''):
 
     ans = ''
     try:
-        ans = eval(expp)
+        ans = round(eval(expp),2)
         await ctx.send(ans)
     except:
         await ctx.send("that's not a valid expression!")  
         return
 
 @client.command()
-async def history(ctx, limit: int = 100): 
-    if ctx.author.id != 506018589904470047:
-        await ctx.send("You don't have perms to do this command. now scramm.. shuu.. shuu...")
-        return
-    try:
-        messages = await ctx.channel.history(limit=limit).flatten()
-        with open("guild.txt", "a+", encoding="utf-8") as f:
-            for message in messages:
-                print(message, sep='\n\n', file=f)
-                embeds = message.embeds
-                for e in embeds:
-                    print(e, sep="\n\n", file=f)
-        await ctx.send("Succesfully written.")
-    except:
-        await ctx.send("Error occured")
-
-#@client.command()
-#async def whois(ctx, *, args=''):
-#    """
-#    Gives the info about User.
-#    """
-#    #try:
-#    id = args.strip()
-#    fuser = await client.fetch_user(id)
-#    logging.info(fuser)
-#    await ctx.send('got it.')
-#    #except:
-#    #    warn = 'hmm..! i need a id to help you.'
-#    #    await ctx.send(warn)
-
-#@client.command()
-#async def clan(ctx, *, args = ''):
-#    if args == '':
-#        await ctx.send('hmm..')
-#        return
-#    inputs = list(args.split())
-
-#    authorID = int(f'{ctx.author.id}')
-#    serverID = int(f'{ctx.author.guild.id}')
-#    adminn = db.child("Admins").child(serverID).get()
-#    print(adminn.val())
-#    admins = []
-#    for i in adminn.each():
-#        admins.append(int(i.val()))
-#    if inputs[0] == "add":
-#        if len(inputs) == 1:
-#            await ctx.send("smh... give me a id...")
-#            return
-#        if authorID in admins:
-#            try:
-#                userToAdd = int(inputs[1])
-#            except:
-#                await ctx.send("smh... give me a id...")
-#            #  VERIFY THE USER
-#            #db.child("clanMembers").child(serverID).push(userToAdd)
-#            await ctx.send('admin checked')
-#        else:
-#            await ctx.send("You are not authorised to use this command...!")
-#    return
-
+async def help(ctx, a:str = None):
+    embed = discord.Embed(color=0xFCDCF5)
+    embed.set_author(name = 'ender games',
+                     icon_url = 'https://cdn.discordapp.com/avatars/786278859775017061/e729d473a2c2536d3f0db8bbe36af627.png')
+    if a is None:
+        embed.title = "**ender games help**"
+        embed.set_footer(text='Use "h.help command" for more info on a command.')
+        embed.add_field(
+            name = 'Miscelleanous',
+            value = '`ping`, `rng`, `calculate`',
+            inline = False,
+        )
+        await ctx.send(embed=embed)
+    elif a == 'ping':
+        embed.title = "**command: ping**"
+        embed.description = "To see the latency in ms(milliseconds)."
+        await ctx.send(embed=embed)
+    elif a == 'rng':
+        embed.title = "**command: rng**"
+        embed.description = """A random number generator between two numbers. \n
+                            **Alias:** None \n
+                            **eg:** `h.rng [a] [b] [c=1(max:10)]`\n
+                            **description:** picks a random number c number of times between a and b.\n
+                            **Notes:** a,b,c should be non negative and a <= b"""
+        await ctx.send(embed=embed)
+    elif a in ['calculate', 'calc', 'c']:
+        embed.title = "**command: calculte**"
+        embed.description = """A Basic calculatoar. uwu \n
+                            **Alias:** c, calc \n
+                            **eg:** h.calc (1+2-3/4) \n
+                            **description:** returns an calculated expression/ a message, if expression is not valid.
+                            """
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("command not found..!")
 
 # miscelleanous functions
 async def reminder(time, id, msgBeforeReminder, msgAfterReminder, which = '', where = 'Channel'):
@@ -202,6 +188,16 @@ async def on_message(message):
     if client.user.id == message.author.id:
         return
 
+    if message.content.find('<@786278859775017061>') != -1:
+        message.channel.send("My prefix here is `h.`")
+
+    if message.channel.id == 858198717898162196:
+        await message.channel.send(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
+        await message.channel.send( message)
+        embeds = message.embeds
+        for embed in embeds:
+            await message.channel.send(embed.to_dict())
+
     channel = message.channel
     channelId = channel.id 
 
@@ -229,7 +225,7 @@ async def on_message(message):
 
                     await reminder(time, channelId, msg1, msg2, 'guildRem') 
     
-    # disboard reminder
+    # disboard reminder                                                       
     if channelId in [857682775578378270, 678167360837779466]:
         if message.author.id == 302050872383242240: # disboard ID
             msg1 = ''
@@ -239,30 +235,25 @@ async def on_message(message):
                 if description.find('Bump done') != -1:
                     minutes = 120
                     personBumped, temps = description.split(', \n')
-                    msg1 = personBumped + ', Ty for bumping. <:okroo:698066343005519872>\n'
+                    msg1 = personBumped + ', Ty for bumping.\n'
                 elif description.find('Please wait another') != -1:
                     temps0, temps1 = description.split(', Please wait another ')
                     temps2 = list(temps1.split())
                     minutes = int(temps2[0])
 
-                    time = minutes*60 # in seconds
-                    msg1 += 'i will remind you to bump in {}mins.'.format(minutes)
-                    msg2 = '<@506018589904470047>, you can bump the server again....!'
-                    await reminder(time, channelId, msg1, msg2, 'bumpRem') 
+                time = minutes*60 # in seconds
+                msg1 += 'i will remind you to bump in {}mins.'.format(minutes)
+                msg2 = '<@506018589904470047>, you can bump the server again....!'
+                await reminder(time, channelId, msg1, msg2, 'bumpRem') 
 
-    # logging.info("---"*50)
-    # print(message.channel.id, message.id, message.author.name, message.content)
-    # logging.info(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
-    # print(message)
+    
     # with open("logs.txt", "a+", encoding="utf-8") as f:
     #     print(message, sep='\n\n', file=f)
     # embeds = message.embeds
-    # print(len(embeds))
     # for embed in embeds:
     #     print(embed.to_dict())
     #     with open("logs.txt", "a+", encoding="utf-8") as f:
     #         print(embed.to_dict(), sep='\n\n', file=f)
-    #  print()
     
     await client.process_commands(message)
 

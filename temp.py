@@ -17,7 +17,7 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
 
 intents = discord.Intents.default()  # All but the two privileged ones
 intents.members = True  # Subscribe to the Members intent
-client = commands.Bot(command_prefix = 'h.', 
+client = commands.Bot(command_prefix = '.h.', 
                       case_insensitive=True,
                      intents=intents,
                      help_command=None)
@@ -70,59 +70,56 @@ def printTime():
 #        response = challonge.participants.create('a9mlgb9p', c)
 #        await ctx.send(response)
 
+@client.command(aliases = ['mir'])
+async def membersinrole(ctx, idn:str = None):
+    if idn is None:
+        await ctx.send("Please enter role id / name")
+        return
 
-@client.command()
-async def settings(ctx):
-    dmenable = "True" if reminderStates['isDmSendEnabled'] else "False"
-    await ctx.send("isDmSendEnabled: " + dmenable)
+    def retRole(rr, ri, rn):
+        rrole = None
+        if ri is None:
+            for i in rr:
+                if i.name.lower() == rn.lower():
+                    rrole = i
+                    break
+        else:
+            for i in rr:
+                if i.id == ri:
+                    rrole = i 
+                    break
+        return rrole
 
-@client.command()
-async def user_details(ctx, a:int = None):
-    try: 
-        user = client.get_user(a)
-        await ctx.send(user.name)
-    except:
-        await ctx.send("invalid id")
+    roles = ctx.guild.roles
+    roleid = None
+    rolename = None
+    if idn.isnumeric():
+        roleid = idn
+    else:
+        rolename = idn
+    
+    role = retRole(roles, roleid, rolename)
+    if role is None:
+        await ctx.send("that role id / name is not found in server.")
+        return
 
-@client.command()
-async def help(ctx, a:str = None):
+    members = role.members
+
+    if len(members) == 0:
+        await ctx.send('There are no members in this role.')
+
     embed = discord.Embed(color=0xFCDCF5)
+    embed.type = 'rich'
     embed.set_author(name = 'ender games',
                      icon_url = 'https://cdn.discordapp.com/avatars/786278859775017061/e729d473a2c2536d3f0db8bbe36af627.png')
-    if a is None:
-        embed.title = "**ender games help**"
-        embed.set_footer(text='Use "h.help command" for more info on a command.')
-        embed.add_field(
-            name = 'Miscelleanous',
-            value = '`ping`, `rng`, `calculate`',
-            inline = False,
-        )
-        await ctx.send(embed=embed)
-    elif a == 'ping':
-        embed.title = "**command: ping**"
-        embed.description = "To see the latency in ms(milliseconds)."
-        await ctx.send(embed=embed)
-        pass
-    elif a == 'rng':
-        embed.title = "**command: rng**"
-        embed.description = """A random number generator between two numbers. \n
-                            Alias: None \u200b eg: h.rng [a] [b] [c=1(max:10)]\n
-                            picks a random number c number of times between a and b.\n
-                            a,b,c should be non negative and a <= b"""
-        await ctx.send(embed=embed)
-        pass
-    elif a in ['calculate', 'calc', 'c']:
-        embed.title = "**command: calculte**"
-        embed.description = """A Basic calculatoar. uwu \n
-                            Aliases: c, calc \n
-                            eg: h.calc (1+2-3/4) \n
-                            returns: a message, if expression is not valid.
-                            """
-        await ctx.send(embed=embed)
-        pass
-    else:
-        await ctx.send("command not found..!")
-
+    embed.title = f'Role: {role.name} ({role.id})\n\n'
+    embed.set_footer(text=f'Page no. related info will be filled')
+    description = f'**Members:**\n\n'
+    
+    for c,m in enumerate(members,1):
+        description += f'**#{c} | {m.name}** ({m.id})\n\n'
+    embed.description = description
+    await ctx.send(embed=embed)
 
 #--------- Events ----------#
 @client.event
@@ -134,13 +131,13 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if client.user.id == message.author.id:
+    if client.user.id == message.author.id or message.author.id == 786278859775017061:
         return
 
-    if message.content.find('<@786278859775017061>') != -1:
-        message.channel.send("My prefix here is `h.`")
+    if message.content.find('<@!860015378816958464>') != -1:
+        await message.channel.send("My prefix here is `.h.`")
 
-    if message.channel.id == 858198717898162196:
+    if message.channel.id == 860017662671061012:
         await message.channel.send(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
         await message.channel.send( message)
         embeds = message.embeds
@@ -171,4 +168,4 @@ async def on_message(message):
                 await reminder(time, channelId, msg1, msg2, 'bumpRem') 
 
     await client.process_commands(message)
-client.run(KEYS.discordToken)
+client.run('a')

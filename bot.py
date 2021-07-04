@@ -36,7 +36,7 @@ reminderStates = defaultdict(bool)
 
 #---------Commands----------#
 @client.command()
-async def ping(ctx):
+async def ping(ctx, case_insensitive=True):
     """
     To see the latency in ms(milliseconds).
     """
@@ -44,7 +44,7 @@ async def ping(ctx):
     await ctx.send(f'pong! {round(client.latency * 1000)}ms')
 
 @client.command()
-async def rng(ctx,*, args=''):
+async def rng(ctx,*, args='', case_insensitive=True):
     """
     A random number generator between two numbers.
     Alias: None
@@ -114,7 +114,7 @@ async def calculate(ctx,*,args=''):
         return
 
 @client.command()
-async def help(ctx, a:str = None):
+async def help(ctx, a:str = None, case_insensitive=True):
     embed = discord.Embed(color=0xFCDCF5)
     embed.set_author(name = 'ender games',
                      icon_url = 'https://cdn.discordapp.com/avatars/786278859775017061/e729d473a2c2536d3f0db8bbe36af627.png')
@@ -133,22 +133,79 @@ async def help(ctx, a:str = None):
         await ctx.send(embed=embed)
     elif a == 'rng':
         embed.title = "**command: rng**"
-        embed.description = """A random number generator between two numbers. \n
-                            **Alias:** None \n
-                            **eg:** `h.rng [a] [b] [c=1(max:10)]`\n
-                            **description:** picks a random number c number of times between a and b.\n
-                            **Notes:** a,b,c should be non negative and a <= b"""
+        description += "A random number generator between two numbers. \n"
+        description += "**Alias:** None \n"
+        description += "**eg:** `h.rng [a] [b] [c=1(max:10)]`\n"
+        description += "**description:** picks a random number c number of times between a and b.\n"
+        description += "**Notes:** a,b,c should be non negative and a <= b"
+        embed.description = description
         await ctx.send(embed=embed)
     elif a in ['calculate', 'calc', 'c']:
         embed.title = "**command: calculte**"
-        embed.description = """A Basic calculatoar. uwu \n
-                            **Alias:** c, calc \n
-                            **eg:** h.calc (1+2-3/4) \n
-                            **description:** returns an calculated expression/ a message, if expression is not valid.
-                            """
+        description = "A Basic calculatoar. uwu \n"
+        description += "**Alias:** c, calc \n"
+        description += "**eg:** h.calc (1+2-3/4) \n"
+        description += "**description:** returns an calculated expression/ a message, if expression is not valid."
+        embed.description = description                    
         await ctx.send(embed=embed)
     else:
         await ctx.send("command not found..!")
+
+@client.command(aliases = ['mir'])
+async def membersinrole(ctx, idn:str = None):
+    """
+    Gives Name and id of the ppl who has the role.
+    Alias: mir
+    **eg:** h.mir <id/Name>
+    """
+    if idn is None:
+        await ctx.send("Please enter role id / name")
+        return
+
+    def retRole(rr, ri, rn):
+        rrole = None
+        if ri is None:
+            for i in rr:
+                if i.name.lower() == rn.lower():
+                    rrole = i
+                    break
+        else:
+            for i in rr:
+                if i.id == ri:
+                    rrole = i 
+                    break
+        return rrole
+
+    roles = ctx.guild.roles
+    roleid = None
+    rolename = None
+    if idn.isnumeric():
+        roleid = idn
+    else:
+        rolename = idn
+    
+    role = retRole(roles, roleid, rolename)
+    if role is None:
+        await ctx.send("that role id / name is not found in server.")
+        return
+
+    members = role.members
+
+    if len(members) == 0:
+        await ctx.send('There are no members in this role.')
+
+    embed = discord.Embed(color=0xFCDCF5)
+    embed.type = 'rich'
+    embed.set_author(name = 'ender games',
+                     icon_url = 'https://cdn.discordapp.com/avatars/786278859775017061/e729d473a2c2536d3f0db8bbe36af627.png')
+    embed.title = f'Role: {role.name} ({role.id})\n\n'
+    embed.set_footer(text=f'Page no. related info will be filled')
+    description = f'**Members:**\n\n'
+    
+    for c,m in enumerate(members,1):
+        description += f'**#{c} | {m.name}** ({m.id})\n\n'
+    embed.description = description
+    await ctx.send(embed=embed)
 
 # miscelleanous functions
 async def reminder(time, id, msgBeforeReminder, msgAfterReminder, which = '', where = 'Channel'):
@@ -188,7 +245,7 @@ async def on_message(message):
     if client.user.id == message.author.id:
         return
 
-    if message.content.find('<@786278859775017061>') != -1:
+    if message.content.find('<@!786278859775017061>') != -1 or message.content.find('<@786278859775017061>') != -1:
         message.channel.send("My prefix here is `h.`")
 
     if message.channel.id == 858198717898162196:
@@ -220,7 +277,7 @@ async def on_message(message):
                         reminders['h'], reminders['m'], reminders['s'] = 2, 0, 0
                 
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s'] # in seconds
-                    msg1 = "reminder is set for {}h {}m {}seconds....! <:teehee:775029757690773517>".format(reminders["h"],reminders["m"],reminders["s"])
+                    msg1 = "reminder is set for {reminders['h']}h {reminders['m']}m {reminders['s']}seconds....! <:teehee:775029757690773517>"
                     msg2 = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
                     await reminder(time, channelId, msg1, msg2, 'guildRem') 
@@ -242,10 +299,8 @@ async def on_message(message):
                     minutes = int(temps2[0])
 
                 time = minutes*60 # in seconds
-                msg1 += 'i will remind you to bump in {}mins.'.format(minutes)
                 msg2 = '<@506018589904470047>, you can bump the server again....!'
-                await reminder(time, channelId, msg1, msg2, 'bumpRem') 
-
+                await reminder(time,channelId,msg1, which = 'bump'+str(channelId))
     
     # with open("logs.txt", "a+", encoding="utf-8") as f:
     #     print(message, sep='\n\n', file=f)

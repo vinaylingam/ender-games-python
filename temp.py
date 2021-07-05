@@ -70,56 +70,6 @@ def printTime():
 #        response = challonge.participants.create('a9mlgb9p', c)
 #        await ctx.send(response)
 
-@client.command(aliases = ['mir'])
-async def membersinrole(ctx, idn:str = None):
-    if idn is None:
-        await ctx.send("Please enter role id / name")
-        return
-
-    def retRole(rr, ri, rn):
-        rrole = None
-        if ri is None:
-            for i in rr:
-                if i.name.lower() == rn.lower():
-                    rrole = i
-                    break
-        else:
-            for i in rr:
-                if i.id == ri:
-                    rrole = i 
-                    break
-        return rrole
-
-    roles = ctx.guild.roles
-    roleid = None
-    rolename = None
-    if idn.isnumeric():
-        roleid = idn
-    else:
-        rolename = idn
-    
-    role = retRole(roles, roleid, rolename)
-    if role is None:
-        await ctx.send("that role id / name is not found in server.")
-        return
-
-    members = role.members
-
-    if len(members) == 0:
-        await ctx.send('There are no members in this role.')
-
-    embed = discord.Embed(color=0xFCDCF5)
-    embed.type = 'rich'
-    embed.set_author(name = 'ender games',
-                     icon_url = 'https://cdn.discordapp.com/avatars/786278859775017061/e729d473a2c2536d3f0db8bbe36af627.png')
-    embed.title = f'Role: {role.name} ({role.id})\n\n'
-    embed.set_footer(text=f'Page no. related info will be filled')
-    description = f'**Members:**\n\n'
-    
-    for c,m in enumerate(members,1):
-        description += f'**#{c} | {m.name}** ({m.id})\n\n'
-    embed.description = description
-    await ctx.send(embed=embed)
 
 #--------- Events ----------#
 @client.event

@@ -171,7 +171,7 @@ async def membersinrole(ctx, idn:str = None):
                     break
         else:
             for i in rr:
-                if i.id == ri:
+                if int(i.id) == int(ri):
                     rrole = i 
                     break
         return rrole
@@ -277,7 +277,7 @@ async def on_message(message):
                         reminders['h'], reminders['m'], reminders['s'] = 2, 0, 0
                 
                     time = (reminders['h']*60 + reminders['m'])*60 + reminders['s'] # in seconds
-                    msg1 = "reminder is set for {reminders['h']}h {reminders['m']}m {reminders['s']}seconds....! <:teehee:775029757690773517>"
+                    msg1 = f"reminder is set for {reminders['h']}h {reminders['m']}m {reminders['s']}seconds....! <:teehee:775029757690773517>"
                     msg2 = '<@506018589904470047>, rpg guild raid/upgrade is ready....!'
 
                     await reminder(time, channelId, msg1, msg2, 'guildRem') 
@@ -300,7 +300,7 @@ async def on_message(message):
 
                 time = minutes*60 # in seconds
                 msg2 = '<@506018589904470047>, you can bump the server again....!'
-                await reminder(time,channelId,msg1, which = 'bump'+str(channelId))
+                await reminder(time,channelId,msg1, '', which = 'bump'+str(channelId))
     
     # with open("logs.txt", "a+", encoding="utf-8") as f:
     #     print(message, sep='\n\n', file=f)

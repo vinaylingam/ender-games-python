@@ -40,7 +40,6 @@ async def ping(ctx, case_insensitive=True):
     """
     To see the latency in ms(milliseconds).
     """
-    print(ctx)
     await ctx.send(f'pong! {round(client.latency * 1000)}ms')
 
 @client.command()
@@ -79,7 +78,6 @@ async def rng(ctx,*, args='', case_insensitive=True):
         if len(warn) == 0:
             seq = [i for i in range(a,b+1)]
             nums = random.sample(seq, k=c)
-            print(nums)
             numsS = ''
             for i in nums:
                 numsS += str(i) + ' '
@@ -321,7 +319,7 @@ async def on_message(message):
             embed = message.embeds[0]
             if len(embed.fields) >0:
                 fields = embed.fields[0]
-                if fields.value.find('The first player who types the following sentence will get it!') != -1:
+                if fields.value.find('The first player who types the following sentence will get') != -1:
                     playerMsg, rewardMsg = fields.value.split('\n')
                     await message.channel.send(rewardMsg)
                     await owner.send(f"[special trade](https://discord.com/{message.guild.id}/{message.channel.id}/{message.id}) - Triggered by: {message.author.name} in <#{message.channel.id}>")

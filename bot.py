@@ -253,6 +253,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
 
+    owner = client.get_user(506018589904470047)
     if client.user.id == message.author.id:
         return
 
@@ -309,13 +310,13 @@ async def on_message(message):
                     temps2 = list(temps1.split())
                     minutes = int(temps2[0])
 
-                await ctx.send(msg1)
+                await message.channel.send(msg1)
                 #time = minutes*60 # in seconds
                 #msg2 = '<@506018589904470047>, you can bump the server again....!'
                 #await reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))
     
     # Special Trades / Random event drops
-    if message.author.id == 555955826880413696:
+    if message.author.id == 555955826880413696: # Epic RPG Bot ID
         if len(message.embeds) > 0:
             embed = message.embeds[0]
             if len(embed.fields) >0:
@@ -323,6 +324,7 @@ async def on_message(message):
                 if fields.value.find('The first player who types the following sentence will get it!') != -1:
                     playerMsg, rewardMsg = fields.value.split('\n')
                     await message.channel.send(rewardMsg)
+                    await owner.send(f"[special trade](https://discord.com/{message.guild.id}/{message.channel.id}/{message.id}) - Triggered by: {message.author.name} in <#{message.channel.id}>")
 
     # with open("logs.txt", "a+", encoding="utf-8") as f:
     #     print(message, sep='\n\n', file=f)

@@ -65,7 +65,7 @@ async def rng(ctx,*, args='', case_insensitive=True):
         else:
             a, b, c = arr[0], arr[1], arr[2]
             if c>10:
-                await ctx.send('10 is the limit of number')
+                await ctx.send('i can only pick at most 10 numbers.')
                 c = 10
             if c>(b-a+1):
                 c = b-a+1
@@ -90,14 +90,14 @@ async def rng(ctx,*, args='', case_insensitive=True):
         await ctx.send('hmm check `h.help rng`')
 
 @client.command(aliases=['c','calc'], case_insensitive=True)
-async def calculate(ctx,*,args=''):
+async def calculate(ctx,*,args = None):
     """
     A Basic calculatoar. uwu
     Aliases: c, calc
     eg: h.calc (1+2-3/4)
     returns: a message, if expression is not valid.
     """
-    if args == '':
+    if args is None:
         await ctx.send("please, enter proper expresision....!")
         return
 
@@ -133,7 +133,7 @@ async def help(ctx, a:str = None, case_insensitive=True):
         await ctx.send(embed=embed)
     elif a == 'rng':
         embed.title = "**command: rng**"
-        description += "A random number generator between two numbers. \n"
+        description = "A random number generator between two numbers. \n"
         description += "**Alias:** None \n"
         description += "**eg:** `h.rng [a] [b] [c=1(max:10)]`\n"
         description += "**description:** picks a random number c number of times between a and b.\n"
@@ -152,7 +152,7 @@ async def help(ctx, a:str = None, case_insensitive=True):
         await ctx.send("command not found..!")
 
 @client.command(aliases = ['mir'])
-async def membersinrole(ctx, idn:str = None):
+async def membersinrole(ctx, idn:str = None, case_insensitive=True):
     """
     Gives Name and id of the ppl who has the role.
     Alias: mir
@@ -207,15 +207,26 @@ async def membersinrole(ctx, idn:str = None):
     embed.description = description
     await ctx.send(embed=embed)
 
+@client.command(aliases=['mdwi'])
+async def messageDetailWithId(ctx, ch:discord.TextChannel, id:int = None, case_insensitive=True):
+
+    message = await ch.fetch_message(id)
+        
+    await ctx.send(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))
+    await ctx.send( message)
+    embeds = message.embeds
+    for embed in embeds:
+        await ctx.send(embed.to_dict())
+        print(embed.to_dict())
+
 # miscelleanous functions
-async def reminder(time, id, msgBeforeReminder, msgAfterReminder, which = '', where = 'Channel'):
+async def reminder(time, id, msgBeforeReminder = None, msgAfterReminder = None, which = None, where = 'Channel'):
     if where == 'Channel':
         remind = client.get_channel(id)
     else: # DM's
         remind = client.get_user(id)
 
     if which != '' and reminderStates[which] == True:
-        await remind.send('reminder is already Set..!')
         return
 
     await remind.send(msgBeforeReminder)
@@ -235,9 +246,9 @@ def printTime():
 #--------events-----------#
 @client.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print(f'We have logged in as {client.user}')
     owner = client.get_user(506018589904470047)
-    await owner.send("im up..! - "+ printTime() )
+    await owner.send("im up..! - "+ printTime())
 
 @client.event
 async def on_message(message):
@@ -298,10 +309,21 @@ async def on_message(message):
                     temps2 = list(temps1.split())
                     minutes = int(temps2[0])
 
-                time = minutes*60 # in seconds
-                msg2 = '<@506018589904470047>, you can bump the server again....!'
-                await reminder(time,channelId,msg1, '', which = 'bump'+str(channelId))
+                await ctx.send(msg1)
+                #time = minutes*60 # in seconds
+                #msg2 = '<@506018589904470047>, you can bump the server again....!'
+                #await reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))
     
+    # Special Trades / Random event drops
+    if message.author.id == 555955826880413696:
+        if len(message.embeds) > 0:
+            embed = message.embeds[0]
+            if len(embed.fields) >0:
+                fields = embed.fields[0]
+                if fields.value.find('The first player who types the following sentence will get it!') != -1:
+                    playerMsg, rewardMsg = fields.value.split('\n')
+                    await message.channel.send(rewardMsg)
+
     # with open("logs.txt", "a+", encoding="utf-8") as f:
     #     print(message, sep='\n\n', file=f)
     # embeds = message.embeds

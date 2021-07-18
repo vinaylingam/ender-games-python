@@ -60,7 +60,7 @@ class Paginator:
         await message.add_reaction("◀")
         await message.add_reaction("▶")
         await message.add_reaction("⏭️")
-        await message.add_reaction("⏹")
+        await message.add_reaction("\N{wastebasket}")
 
         try:
             while True:
@@ -75,7 +75,7 @@ class Paginator:
                 except:
                     pass
 
-                if reaction.emoji == "⏹":
+                if reaction.emoji == "\N{wastebasket}":
                     await message.delete()
                     return
 

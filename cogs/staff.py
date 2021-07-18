@@ -1,7 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands, menus
-from helpers import pagination
+from helpers import pagination, checkers
 
 # TODO
 # membersinrole - convert idn to discord.guild.role and add command error handler
@@ -14,7 +14,7 @@ class Staff(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases = ['mir'])
-    async def membersinrole(self, ctx, idn:str = None, case_insensitive=True):
+    async def membersinrole(self, ctx, *, idn:str = None, case_insensitive=True):
         """
         Gives list of users who have this role.
         **usage** 
@@ -22,6 +22,10 @@ class Staff(commands.Cog):
         **Alias**
         mir
         """
+        if not checkers.isStaff(ctx.message.author):
+            await ctx.send("You are not part of LIMBO staff. you can't use this command.")
+            return
+
         if idn is None:
             await ctx.send("Please enter role id / name")
             return

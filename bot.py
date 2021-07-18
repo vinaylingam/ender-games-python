@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, events
-from configu import KEYS
-#import pyrebase
+from config import KEYS
 import asyncio
 from datetime import datetime
 from pytz import timezone

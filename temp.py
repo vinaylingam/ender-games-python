@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, events
-from configu import KEYS
-#import pyrebase
+from config import KEYS
 import asyncio
 from datetime import datetime
 from pytz import timezone
@@ -10,7 +9,6 @@ from collections import defaultdict
 
 COGS = [
     'channels',
-    'db',
     'dev',
     'help',
     'miscellaneous',
@@ -22,7 +20,7 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
     def __init__(self, **kwargs):
         super().__init__(
             **kwargs,
-            command_prefix= 'h..',
+            command_prefix= 'hh.',
             case_insensitive=True,
             intents=discord.Intents.all(),
         )

@@ -4,6 +4,7 @@ import random
 #import pyrebase
 import asyncio 
 from collections import defaultdict
+import requests
 
 class Miscellaneous(commands.Cog):
     """
@@ -161,13 +162,21 @@ class Miscellaneous(commands.Cog):
                     if description.find('Bump done') != -1:
                         minutes = 120
                         personBumped, temps = description.split(', \n')
-                        msg1 = personBumped + ', Ty for bumping.\n'
+                        
+                        response = requests.get("https://complimentr.com/api")
+                        complimentb = response.content.decode("UTF-8")
+                        compliment = ast.literal_eval(complimentb)
+
+                        msg1 = personBumped + ', Ty for bumping'
+                        if compliment["compliment"]:
+                             msg1 += ' and ' + compliment['compliment']
+                        await message.channel.send(msg1)
+
                     elif description.find('Please wait another') != -1:
                         temps0, temps1 = description.split(', Please wait another ')
                         temps2 = list(temps1.split())
                         minutes = int(temps2[0])
 
-                    await message.channel.send(msg1)
                     #time = minutes*60 # in seconds
                     #msg2 = '<@506018589904470047>, you can bump the server again....!'
                     #await self.reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))

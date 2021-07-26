@@ -5,6 +5,7 @@ import random
 import asyncio 
 from collections import defaultdict
 import requests
+import ast
 
 class Miscellaneous(commands.Cog):
     """

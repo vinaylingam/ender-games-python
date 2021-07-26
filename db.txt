@@ -1,0 +1,13 @@
+Documents:
+
+1. Member
+ - - id (attribute = "_id")
+ - - did (long)
+ - - ownedChannels (long)
+
+2. Channel
+ - - id (attribute = "_id")
+ - - cid (long)
+ - - Owners (list)
+ - - claimType (string)
+

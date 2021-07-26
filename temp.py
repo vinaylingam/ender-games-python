@@ -12,9 +12,9 @@ COGS = [
     'dev',
     'help',
     'miscellaneous',
+    'mongo',
     'staff'
     ]
-
 
 class Bot(commands.AutoShardedBot, events.EventsMixin):
     def __init__(self, **kwargs):
@@ -29,8 +29,8 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
             self.load_extension(f"cogs.{i}")
     
     @property
-    def db(self):
-        return self.get_cog('Db')
+    def mongo(self):
+        return self.get_cog('Mongo')
 
     def printTime():
         format = "%Y-%m-%d %H:%M:%S %Z%z"

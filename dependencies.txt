@@ -1,2 +1,5 @@
 discord-ext-menus==1.0.0a30+g309c702
 discord-ext-events==0.1.0a0
+umongo==3.0.0
+motor==2.4.0
+pymongo==3.12.0

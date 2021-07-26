@@ -116,7 +116,7 @@ class Miscellaneous(commands.Cog):
             return
 
         if message.content.find('<@!786278859775017061>') != -1 or message.content.find('<@786278859775017061>') != -1:
-            message.channel.send("My prefix here is `h.`")
+            await message.channel.send("My prefix here is `h.`")
 
         if message.channel.id == 858198717898162196:
             await message.channel.send(str(message.channel.id) + ' ' + str(message.id) + ' ' + str(message.author.name) + ' ' + str(message.content))

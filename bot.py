@@ -18,7 +18,7 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
     def __init__(self, **kwargs):
         super().__init__(
             **kwargs,
-            command_prefix= 'h..',
+            command_prefix= 'h.',
             case_insensitive=True,
             intents=discord.Intents.all(),
         )

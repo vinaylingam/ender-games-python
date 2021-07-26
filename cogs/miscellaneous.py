@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import random
-#import pyrebase
 import asyncio 
 from collections import defaultdict
 import requests

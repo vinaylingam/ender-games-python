@@ -182,15 +182,15 @@ class Miscellaneous(commands.Cog):
                     #await self.reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))
     
         # Special Trades / Random event drops
-        if message.author.id == 555955826880413696: # Epic RPG Bot ID
-            if len(message.embeds) > 0:
-                embed = message.embeds[0]
-                if len(embed.fields) >0:
-                    fields = embed.fields[0]
-                    if fields.value.find('The first player who types the following sentence will get') != -1:
-                        playerMsg, rewardMsg = fields.value.split('\n')
-                        await message.channel.send(rewardMsg)
-                        await owner.send(f"special trade - https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id}\n - Triggered by: {message.author.name} in <#{message.channel.id}>")
+        #if message.author.id == 555955826880413696: # Epic RPG Bot ID
+        #    if len(message.embeds) > 0:
+        #        embed = message.embeds[0]
+        #        if len(embed.fields) >0:
+        #            fields = embed.fields[0]
+        #            if fields.value.find('The first player who types the following sentence will get') != -1:
+        #                playerMsg, rewardMsg = fields.value.split('\n')
+        #                await message.channel.send(rewardMsg)
+        #                await owner.send(f"special trade - https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id}\n - Triggered by: {message.author.name} in <#{message.channel.id}>")
     
 
 def setup(bot):

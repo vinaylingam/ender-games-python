@@ -13,7 +13,8 @@ COGS = [
     'help',
     'miscellaneous',
     'mongo',
-    'staff'
+    'staff',
+    'configuration'
     ]
 
 class Bot(commands.AutoShardedBot, events.EventsMixin):

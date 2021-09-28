@@ -161,13 +161,13 @@ class Miscellaneous(commands.Cog):
                     description = embed.description
                     if description.find('Bump done') != -1:
                         minutes = 120
-                        personBumped, temps = description.split(', \n')
+                        temps = description
                         
                         response = requests.get("https://complimentr.com/api")
                         complimentb = response.content.decode("UTF-8")
                         compliment = ast.literal_eval(complimentb)
 
-                        msg1 = personBumped + ', Ty for bumping'
+                        msg1 = 'Ty for bumping'
                         if compliment["compliment"]:
                              msg1 += ' and ' + compliment['compliment']
                         await message.channel.send(msg1)

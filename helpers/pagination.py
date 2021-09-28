@@ -53,13 +53,11 @@ class Paginator:
         embed = await self.get_page(pidx)
         message = await ctx.send(embed=embed)
 
-        if self.num_pages <= 1:
-            return
-
-        await message.add_reaction("⏮️")
-        await message.add_reaction("◀")
-        await message.add_reaction("▶")
-        await message.add_reaction("⏭️")
+        if self.num_pages > 1:
+            await message.add_reaction("⏮️")
+            await message.add_reaction("◀")
+            await message.add_reaction("▶")
+            await message.add_reaction("⏭️")
         await message.add_reaction("\N{wastebasket}")
 
         try:

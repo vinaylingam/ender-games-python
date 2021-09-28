@@ -22,8 +22,9 @@ class Staff(commands.Cog):
         **Alias**
         mir
         """
-        if not checkers.isStaff(ctx.message.author):
-            await ctx.send("You are not part of LIMBO staff. you can't use this command.")
+        server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if not checkers.isStaff(server, ctx.message.author):
+            await ctx.send("only staff can do this command")
             return
 
         if idn is None:

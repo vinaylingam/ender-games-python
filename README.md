@@ -1,2 +1,2 @@
 # helper
-Bot to organize boosted Miniboss and Arena for EPIC RPG Discord Bot and help managing clan donations for Anigame discord bot
+sorry nothing mentioned is implemented yet. 

@@ -42,7 +42,7 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
     async def on_ready(self):
         print(f'We have logged in as {self.user}')
         owner = self.get_user(506018589904470047)
-        await owner.send("im up..! - ")
+        await owner.send(f"im up..! - {0}".format(printTime()))
 
 if __name__ == "__main__":
     bot = Bot()

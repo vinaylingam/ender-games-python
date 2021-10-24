@@ -23,7 +23,10 @@ class channels(commands.Cog, name = "channel"):
         notChannelOwners = []
 
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author):
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return
 
@@ -68,7 +71,10 @@ class channels(commands.Cog, name = "channel"):
         """
 
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author):
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return
 
@@ -92,11 +98,11 @@ class channels(commands.Cog, name = "channel"):
         embed.description = descr
         message = await ctx.send(embed = embed)
 
-    @channelinfo.error
-    async def channelinfo_error(self, ctx, error):
-        await ctx.send('pls check, `h.help channelinfo`')
+    #@channelinfo.error
+    #async def channelinfo_error(self, ctx, error):
+    #    await ctx.send('pls check, `h.help channelinfo`')
 
-    @commands.command(alias = ['addowners'], case_insensitive=True)
+    @commands.command(aliases = ['addowners'], case_insensitive=True)
     async def addowner(self, ctx, ch: discord.TextChannel, members: commands.Greedy[discord.Member]):
         """
         Add owners to the given channel.
@@ -109,7 +115,10 @@ class channels(commands.Cog, name = "channel"):
         channelOwners = []
 
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author):
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return
 
@@ -179,7 +188,7 @@ class channels(commands.Cog, name = "channel"):
     async def addowner_error(self, ctx, error):
         await ctx.send(f'you either missed mentioning channel or the member. pls check `h.help addowner`')
     
-    @commands.command(alias = ['ro', 'removeowners'], case_insensitive = True)
+    @commands.command(aliases = ['ro', 'removeowners'], case_insensitive = True)
     async def removeowner(self, ctx, ch: discord.TextChannel, members: commands.Greedy[discord.Member]):
         """
         remove owners from channel
@@ -191,7 +200,10 @@ class channels(commands.Cog, name = "channel"):
         channelOwners = []
 
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author):
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return
 
@@ -262,7 +274,10 @@ class channels(commands.Cog, name = "channel"):
         """
 
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author) :
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) :
             await ctx.send("only staff can do this command")
             return
 
@@ -292,7 +307,10 @@ class channels(commands.Cog, name = "channel"):
         resCh = await self.bot.mongo.fetch_channel_info(ctx.message.channel)
         
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
             await ctx.send("you should be either owner of this channel or the staff to do this command")
             return
     
@@ -322,7 +340,10 @@ class channels(commands.Cog, name = "channel"):
         resCh = await self.bot.mongo.fetch_channel_info(ch)
         
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
             await ctx.send("you should be either owner of this channel or the staff to do this command")
             return
     
@@ -337,7 +358,7 @@ class channels(commands.Cog, name = "channel"):
     async def channelName_error(self, ctx, error):
         await ctx.send('pls check, `h.help channelName`')
 
-    @commands.command(alias=['channeltopic'], case_insensitive=True)
+    @commands.command(aliases = ['channeltopic'], case_insensitive=True)
     async def channelDescription(self, ctx, ch:discord.TextChannel = None, *, description:str = None):
         """
         change name of the channel.
@@ -353,7 +374,10 @@ class channels(commands.Cog, name = "channel"):
         resCh = await self.bot.mongo.fetch_channel_info(ch)
         
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
             await ctx.send("you should be either owner of this channel or the staff to do this command")
             return
     

@@ -16,7 +16,10 @@ class Configuration(commands.Cog):
         None
         """
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
-        if not checkers.isStaff(server, ctx.message.author):
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return
 
@@ -35,7 +38,7 @@ class Configuration(commands.Cog):
         embed.description = descr
         await ctx.send(embed = embed)  
         
-    @commands.command(alias = ['addstaffroles', 'addstaffrole'], case_insensitive=True)
+    @commands.command(aliases = ['addstaffroles', 'addstaffrole'], case_insensitive=True)
     async def addstaff(self, ctx, roles: commands.Greedy[discord.Role] = None):
         """
         Add staff roles to server.
@@ -61,7 +64,7 @@ class Configuration(commands.Cog):
         embed.description = descr
         await ctx.send(embed = embed)
 
-    @commands.command(alias = ['removestaffroles', 'removestaffrole'], case_insensitive=True)
+    @commands.command(aliases = ['removestaffroles', 'removestaffrole'], case_insensitive=True)
     async def removestaff(self, ctx, roles: commands.Greedy[discord.Role] = None):
         """
         remove staff role from server.

@@ -1,3 +1,4 @@
+import certifi
 import discord
 from discord.ext import commands
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -35,7 +36,7 @@ class Mongo(commands.Cog):
 
     def __init__(self,bot):
         self.bot = bot
-        self.client = AsyncIOMotorClient(KEYS.DATABASE_URI, io_loop=bot.loop)
+        self.client = AsyncIOMotorClient(KEYS.DATABASE_URI, io_loop=bot.loop, tlsCAFile=certifi.where())
         self.db = self.client[KEYS.DATABASE_NAME]
         
         instance = MotorAsyncIOInstance(self.db)

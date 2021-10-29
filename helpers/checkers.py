@@ -3,7 +3,7 @@ from config import config
 from discord.ext import commands
 
 def isOwner(member):
-    return member.id is config._owner
+    return member.id == config._owner
 
 def isAdmin(member):
     return isOwner(member) or member.guild_permissions.administrator

@@ -23,6 +23,9 @@ class Staff(commands.Cog):
         mir
         """
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
         if not checkers.isStaff(server, ctx.message.author):
             await ctx.send("only staff can do this command")
             return

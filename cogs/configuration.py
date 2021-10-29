@@ -47,7 +47,7 @@ class Configuration(commands.Cog):
         **Alias**
         addstaffroles, addstaffrole
         """
-        if not checkers.isAdmin(ctx.message.author):
+        if not (checkers.isAdmin(ctx.message.author) or checkers.isOwner(ctx.message.author)):
             await ctx.send("only admin can do this command")
             return
 

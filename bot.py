@@ -11,8 +11,8 @@ COGS = [
     'dev',
     'help',
     'miscellaneous',
-    'staff'
-    'channels'
+    'staff',
+    'channels',
     'mongo',
     'configuration'
     ]
@@ -30,8 +30,8 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
             self.load_extension(f"cogs.{i}")
     
     @property
-    def db(self):
-        return self.get_cog('Db')
+    def mongo(self):
+        return self.get_cog('Mongo')
 
     def printTime():
         format = "%Y-%m-%d %H:%M:%S %Z%z"
@@ -42,7 +42,7 @@ class Bot(commands.AutoShardedBot, events.EventsMixin):
     async def on_ready(self):
         print(f'We have logged in as {self.user}')
         owner = self.get_user(506018589904470047)
-        await owner.send(f"im up..! - {0}".format(printTime()))
+        await owner.send("im up..! -")
 
 if __name__ == "__main__":
     bot = Bot()

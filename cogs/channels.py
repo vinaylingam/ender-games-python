@@ -5,19 +5,19 @@ from helpers import checkers
 
 class channels(commands.Cog, name = "channel"):
     """
-    manages channel owners, pin, description, name
+    manage channel functionalities.
     """
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases = ['vo', 'verifyowners', 'verifyowner'], case_insensitive=True)
-    async def verifyownership(self, ctx, members: commands.Greedy[discord.Member] = None):
+    @commands.command(aliases = ['vo', 'verifyowners'], case_insensitive=True)
+    async def verifyowner(self, ctx, members: commands.Greedy[discord.Member] = None):
         """
         returns channel name if you own any.
         **Usage**
-        h.vo [discord_user]
+        h.verifyowner <id1>, <id2>
         **Alias**
-        vo
+        vo, verifyowners
         """
         channelOwners = []
         notChannelOwners = []
@@ -56,8 +56,8 @@ class channels(commands.Cog, name = "channel"):
         embed.description = descr
         await ctx.send(embed = embed)
 
-    @verifyownership.error
-    async def verifyownership_error(self, ctx, error):
+    @verifyowner.error
+    async def verifyowner_error(self, ctx, error):
         await ctx.send('pls check, `h.help verifyownership`')
 
     @commands.command(aliases = ['ci'], case_insensitive=True)
@@ -65,7 +65,7 @@ class channels(commands.Cog, name = "channel"):
         """
         gives Number of owners of mentioned channel.
         **Usage**
-        h.channelinfo [channel]
+        h.channelinfo <channel_id>
         **Alias**
         ci
         """
@@ -81,6 +81,9 @@ class channels(commands.Cog, name = "channel"):
         if ch is None:
             ch = ctx.message.channel
         resCh = await self.bot.mongo.fetch_channel_info(ch)
+        if resCh is None:
+            await ctx.send("channel owners are not set")
+            return
 
         descr = ''
 
@@ -98,16 +101,12 @@ class channels(commands.Cog, name = "channel"):
         embed.description = descr
         message = await ctx.send(embed = embed)
 
-    #@channelinfo.error
-    #async def channelinfo_error(self, ctx, error):
-    #    await ctx.send('pls check, `h.help channelinfo`')
-
     @commands.command(aliases = ['addowners'], case_insensitive=True)
     async def addowner(self, ctx, ch: discord.TextChannel, members: commands.Greedy[discord.Member]):
         """
         Add owners to the given channel.
         **Usage**
-        h.addowner <channel> <user_1> <user_2> ...
+        h.addowner <channel> <user_id1> <user_id2> ...
         **Alias**
         None
         """
@@ -258,6 +257,8 @@ class channels(commands.Cog, name = "channel"):
                 descr += '\n\n **removing owners cancelled**.'
                 embed.description = descr
                 await message.edit(embed = embed)
+        else:
+            await ctx.send("mentioned members are not owners of this channel..!")
 
     @removeowner.error
     async def removeowner_error(self, ctx, error):
@@ -268,7 +269,7 @@ class channels(commands.Cog, name = "channel"):
         """
         Set the type of claim type :- booster or normal
         **usage**
-        h.setchanneltype <channel> [claim type]
+        h.setchanneltype <channel> <claim_type>
         **Alias**
         None
         """
@@ -297,13 +298,23 @@ class channels(commands.Cog, name = "channel"):
         """
         pin a message if you are owner of channel / staff member
         **usage**
-        h.ping <message_id>
+        h.pin <message_id>
         **Alias**
         None
         """
+        
+        if mid is None:
+            await ctx.send('Please check `h.help pin`')
+            return
+
         mem = ctx.guild.get_member(ctx.author.id)
 
-        message = await ctx.message.channel.fetch_message(mid)
+        try:
+            message = await ctx.message.channel.fetch_message(mid)
+        except:
+            await ctx.send("Please provide proper message id")
+            return
+
         resCh = await self.bot.mongo.fetch_channel_info(ctx.message.channel)
         
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
@@ -314,18 +325,56 @@ class channels(commands.Cog, name = "channel"):
             await ctx.send("you should be either owner of this channel or the staff to do this command")
             return
     
+        try:
+            await message.pin()
+            await ctx.send('message is pinned.')
+        except Exception as e:
+            if e.code == 30003:
+                await ctx.send(e.text)
+            else:
+                await ctx.send('unknown error.')
+
+    @commands.command(case_insensitive=True)
+    async def unpin(self, ctx, mid = None):
+        """
+        unpin a message if you are owner of channel / staff member
+        **usage**
+        h.unpin <message_id>
+        **Alias**
+        None
+        """
+        
         if mid is None:
-            await ctx.send('Please check `h.help pin`')
+            await ctx.send('Please check `h.help unpin`')
             return
 
-        await message.pin()
-        await ctx.send('message is pinned.')
+        mem = ctx.guild.get_member(ctx.author.id)
 
-    @pin.error
-    async def pin_error(self, ctx, error):
-        await ctx.send('pls check, `h.help pin`')
+        try:
+            message = await ctx.message.channel.fetch_message(mid)
+        except:
+            await ctx.send("Please provide proper message id")
+            return
+
+        resCh = await self.bot.mongo.fetch_channel_info(ctx.message.channel)
         
-            
+        server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
+            await ctx.send("you should be either owner of this channel or the staff to do this command")
+            return
+    
+        try:
+            await message.unpin()
+            await ctx.send('message is removed from pins.')
+        except Exception as e:
+            if e.code == 30003:
+                await ctx.send(e.text)
+            else:
+                await ctx.send('unknown error.')
+        
     @commands.command(case_insensitive=True)
     async def channelName(self, ctx, ch:discord.TextChannel = None, *, name:str = None):
         """
@@ -358,14 +407,14 @@ class channels(commands.Cog, name = "channel"):
     async def channelName_error(self, ctx, error):
         await ctx.send('pls check, `h.help channelName`')
 
-    @commands.command(aliases = ['channeltopic'], case_insensitive=True)
+    @commands.command(aliases = ['channeltopic', 'chdes'], case_insensitive=True)
     async def channelDescription(self, ctx, ch:discord.TextChannel = None, *, description:str = None):
         """
         change name of the channel.
         **Usage**
-        h.channeldescription <channel> <description>
+        h.chdes <channel> <description>
         **alias**
-        channeltopic
+        channeltopic, chdes
         **Permissions**
         Staff or channel owner
         """

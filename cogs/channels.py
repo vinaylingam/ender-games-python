@@ -94,6 +94,8 @@ class channels(commands.Cog, name = "channel"):
             descr += '**Owners**\n'
             for idx, mem in enumerate(resCh.owners):
                 memb = ctx.guild.get_member(mem)
+                if memb is None:
+                    continue
                 descr += f':small_blue_diamond: {memb.name} ({memb.id})\n'
         
         embed = discord.Embed(color=0xFCDCF5, title='Channel Info')

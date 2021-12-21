@@ -1,2 +1,2 @@
 # helper
-sorry nothing mentioned is implemented yet. 
+sorry nothing is implemented yet. 

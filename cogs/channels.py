@@ -243,6 +243,8 @@ class channels(commands.Cog, name = "channel"):
                         descr += '\n\n**members are removed from channel succesfully**'
                         
                         await self.bot.mongo.update_channel(ch, {'$pull': {'owners': { '$in' : channelOwners }}})
+                        for mem in channelOwners:
+                            await self.bot.mongo.update_member(mem, ctx.message.guild, {'$set': { 'channelOwned': None }})
                         embed.description = descr
                         await message.edit(embed = embed)
                         break

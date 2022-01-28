@@ -5,6 +5,7 @@ import asyncio
 from collections import defaultdict
 import requests
 import ast
+from helpers import checkers
 
 class Miscellaneous(commands.Cog):
     """
@@ -108,6 +109,48 @@ class Miscellaneous(commands.Cog):
             await ctx.send("that's not a valid expression!")  
             return
 
+
+    @commands.command(case_insensitive=True)
+    async def mb(self, ctx, ch: discord.TextChannel = None, mid: int = None):
+        """
+        send mb list to mentioned channel.
+        **Usage**
+        h.mb <channel> <mid>
+        **Permissions**
+        Staff
+        """
+        
+        if ch is None or mid is None:
+            ctx.send("please check `h.help mb`")
+            return
+
+        try:
+            message = await ctx.message.channel.fetch_message(mid)
+        except:
+            await ctx.send("Please provide proper message id")
+            return
+        
+        server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
+            await ctx.send("you are not authorized to do this command")
+            return
+    
+        ppl = message.mentions
+        
+        if len(ppl) > 0:
+            build = '```\nrpg miniboss '
+            for i in ppl:
+                build += i.mention + ' '
+            build += '\n```'
+            await ch.send("Copy the following command for miniboss:")
+            await ch.send(build)
+            await ctx.send("command sent to " + ch.mention)
+        else:
+            await ctx.send("No people in the message")
+
     @commands.Cog.listener()
     async def on_message(self, message):
 
@@ -192,6 +235,7 @@ class Miscellaneous(commands.Cog):
         #                await message.channel.send(rewardMsg)
         #                await owner.send(f"special trade - https://discord.com/channels/{message.guild.id}/{message.channel.id}/{message.id}\n - Triggered by: {message.author.name} in <#{message.channel.id}>")
     
+
 
 def setup(bot):
    bot.add_cog(Miscellaneous(bot))

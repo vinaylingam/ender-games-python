@@ -380,6 +380,44 @@ class channels(commands.Cog, name = "channel"):
                 await ctx.send('unknown error.')
         
     @commands.command(case_insensitive=True)
+    async def delete(self, ctx, mid = None):
+        """
+        deletes a message if you are owner of channel / staff member
+        **usage**
+        h.delete <message_id>
+        **Alias**
+        None
+        """
+        
+        if mid is None:
+            await ctx.send('Please check `h.help unpin`')
+            return
+
+        mem = ctx.guild.get_member(ctx.author.id)
+
+        try:
+            message = await ctx.message.channel.fetch_message(mid)
+        except:
+            await ctx.send("Please provide proper message id")
+            return
+
+        resCh = await self.bot.mongo.fetch_channel_info(ctx.message.channel)
+        
+        server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author) and mem.id not in resCh.owners :
+            await ctx.send("you should be either owner of this channel or the staff to do this command")
+            return
+    
+        try:
+            await message.delete()
+            await ctx.send('message is deleted.')
+        except Exception as e:
+                await ctx.send(e.text)
+
+    @commands.command(case_insensitive=True)
     async def channelName(self, ctx, ch:discord.TextChannel = None, *, name:str = None):
         """
         change name of the channel.

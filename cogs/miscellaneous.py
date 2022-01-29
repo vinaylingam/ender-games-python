@@ -116,14 +116,27 @@ class Miscellaneous(commands.Cog):
         send mb list to mentioned channel.
         **Usage**
         h.mb <channel> <mid>
+        or 
+        `reply to message`
         **Permissions**
         Staff
         """
         
-        if ch is None or mid is None:
-            ctx.send("please check `h.help mb`")
+        if ch is None:
+            await ctx.send("please check `h.help mb`")
             return
 
+        mess = await ctx.message.channel.fetch_message(ctx.message.id)
+        ref = mess.reference
+        
+        if mid is None:
+            if ref is None:
+                await ctx.send("please check `h.help mb`")
+                return
+            else:
+                mid = ref.message_id
+        
+        
         try:
             message = await ctx.message.channel.fetch_message(mid)
         except:

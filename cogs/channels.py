@@ -303,13 +303,21 @@ class channels(commands.Cog, name = "channel"):
         pin a message if you are owner of channel / staff member
         **usage**
         h.pin <message_id>
+        or 
+        reply to message
         **Alias**
         None
         """
         
+        mess = await ctx.message.channel.fetch_message(ctx.message.id)
+        ref = mess.reference
+        
         if mid is None:
-            await ctx.send('Please check `h.help pin`')
-            return
+            if ref is None:
+                await ctx.send("please check `h.help pin`")
+                return
+            else:
+                mid = ref.message_id
 
         mem = ctx.guild.get_member(ctx.author.id)
 
@@ -344,13 +352,21 @@ class channels(commands.Cog, name = "channel"):
         unpin a message if you are owner of channel / staff member
         **usage**
         h.unpin <message_id>
+        or 
+        reply to message
         **Alias**
         None
         """
         
+        mess = await ctx.message.channel.fetch_message(ctx.message.id)
+        ref = mess.reference
+        
         if mid is None:
-            await ctx.send('Please check `h.help unpin`')
-            return
+            if ref is None:
+                await ctx.send("please check `h.help unpin`")
+                return
+            else:
+                mid = ref.message_id
 
         mem = ctx.guild.get_member(ctx.author.id)
 
@@ -386,12 +402,20 @@ class channels(commands.Cog, name = "channel"):
         **usage**
         h.delete <message_id>
         **Alias**
+        or
+        reply to message
         None
         """
         
+        mess = await ctx.message.channel.fetch_message(ctx.message.id)
+        ref = mess.reference
+        
         if mid is None:
-            await ctx.send('Please check `h.help unpin`')
-            return
+            if ref is None:
+                await ctx.send("please check `h.help delete`")
+                return
+            else:
+                mid = ref.message_id
 
         mem = ctx.guild.get_member(ctx.author.id)
 

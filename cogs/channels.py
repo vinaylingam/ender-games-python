@@ -486,6 +486,10 @@ class channels(commands.Cog, name = "channel"):
         """
         mem = ctx.guild.get_member(ctx.author.id)
 
+        if ch is None or description is None:
+            await ctx.send('pls check, `h.help channelDescription`')
+            return
+
         resCh = await self.bot.mongo.fetch_channel_info(ch)
         
         server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
@@ -496,16 +500,45 @@ class channels(commands.Cog, name = "channel"):
             await ctx.send("you should be either owner of this channel or the staff to do this command")
             return
     
-        if ch is None or description is None:
-            await ctx.send('pls check, `h.help channelDescription`')
-            return
-
         await ch.edit(topic = description)
         await ctx.send('channel description is changed.')
 
     @channelDescription.error
     async def channelDescription_error(self, ctx, error):
         await ctx.send('pls check, `h.help channelDescription`')
+
+    @commands.command(aliases = ['sm', 'slow'], case_insensitive=True)
+    async def slowmode(self, ctx, ch:discord.TextChannel = None, time:int = 5):
+        """
+        add slowmode to channel.
+        **Usage**
+        h.slowmode <channel> <time_in_seconds>
+        **Permissions**
+        Staff
+        **aliases**
+        sm, slow
+        - default time is 5 sec
+        """
+        mem = ctx.guild.get_member(ctx.author.id)
+
+        if ch is None:
+            await ctx.send('pls check, `h.help slowmode`')
+            return
+
+        resCh = await self.bot.mongo.fetch_channel_info(ch)
+        
+        server = await self.bot.mongo.fetch_server_info(ctx.message.guild)
+        if server is None or server.staff is None:
+            await ctx.send("Server staff are not assigned, Please ask the admin to add staff (command: `addstaff`)")
+            return
+        elif not checkers.isStaff(server, ctx.message.author):
+            await ctx.send("only staff are allowed to do this command")
+            return
+    
+        await ch.edit(slowmode_delay  = time)
+        await ch.send(f'slow mode is set for {time} seconds')
+        if ch.id != ctx.channel.id :
+            await ctx.send(f'slow mode in {ch.mention} is set for {time} seconds')
 
 def setup(bot):
     bot.add_cog(channels(bot))

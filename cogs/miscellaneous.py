@@ -226,16 +226,15 @@ class Miscellaneous(commands.Cog):
                         msg1 = 'Ty for bumping'
                         if compliment["compliment"]:
                              msg1 += ' and ' + compliment['compliment']
-                        await message.channel.send(msg1)
 
                     elif description.find('Please wait another') != -1:
                         temps0, temps1 = description.split(', Please wait another ')
                         temps2 = list(temps1.split())
                         minutes = int(temps2[0])
 
-                    #time = minutes*60 # in seconds
-                    #msg2 = '<@506018589904470047>, you can bump the server again....!'
-                    #await self.reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))
+                    time = minutes*60 # in seconds
+                    msg2 = 'Please type `/bump` <#678167360837779466>'
+                    await self.reminder(time,channelId,msg1, msg2, which = 'bump'+str(channelId))
     
         # Special Trades / Random event drops
         #if message.author.id == 555955826880413696: # Epic RPG Bot ID
